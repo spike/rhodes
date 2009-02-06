@@ -1,3 +1,6 @@
+== 0.3.0 2009-02-05
+ * initial 0.3 release
+
 == 0.2.6 2009-01-29
  * changed signature of url_for, link_to, and redirect
 
