@@ -1,0 +1,8 @@
+lib/rhodes-build.rb
+lib/tasks/rhodes-build.rb
+lib/tasks/rspec.rake
+lib/version.rb
+Manifest.txt
+Rakefile
+rhodes-build.gemspec
+spec/spec.opts
