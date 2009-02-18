@@ -1,7 +1,14 @@
 lib/rhodes-build.rb
 lib/tasks/rhodes-build.rb
+lib/tasks/bundle.rake
 lib/tasks/rspec.rake
+lib/jake.rb
 lib/version.rb
+lib/compileERB/bb.rb
+lib/compileERB/default.rb
+lib/manifest/createAppManifest.rb
+res/RhoRuby.exe
+res/xruby-0.3.3.jar
 Manifest.txt
 Rakefile
 rhodes-build.gemspec

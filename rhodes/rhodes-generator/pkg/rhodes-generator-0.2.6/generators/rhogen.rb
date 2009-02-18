@@ -34,19 +34,37 @@ module Rhogen
 
     template :application do |template|
       template.source = 'application.rb'
-      template.destination = "#{name.camel_case}/application.rb"
+      template.destination = "#{name.camel_case}/app/application.rb"
     end
 
     template :index do |template|
       template.source = 'index.erb'
-      template.destination = "#{name.camel_case}/index.erb"
+      template.destination = "#{name.camel_case}/app/index.erb"
     end
 
     template :layout do |template|
       template.source = 'layout.erb'
-      template.destination = "#{name.camel_case}/layout.erb"
+      template.destination = "#{name.camel_case}/app/layout.erb"
     end
 
+    template :config do |template|
+      template.source = 'config.rb'
+      template.destination = "#{name.camel_case}/config.rb"
+    end
+
+    directory :public do |directory|
+      directory.source = 'public'
+      directory.destination = "#{name.camel_case}/public/"
+    end
+
+    empty_directory :images do |directory|
+      directory.destination = "#{name.camel_case}/public/images/"
+    end
+ 
+    template :rakefile do |template|
+      template.source = 'Rakefile'
+      template.destination = "#{name.camel_case}/Rakefile"
+    end
   end
 
   class ModelGenerator < BaseGenerator
@@ -97,6 +115,8 @@ module Rhogen
       template.source = 'controller.rb'
       template.destination = "#{name.camel_case}/controller.rb"
     end
+
+
 
     def attributes?
       self.attributes && !self.attributes.empty?
