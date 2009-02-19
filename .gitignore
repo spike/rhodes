@@ -40,7 +40,6 @@ ABLD.BAT
 *.hlp
 *.hrh
 
-*.jar
 *.cod
 *.debug
 *.rapc
