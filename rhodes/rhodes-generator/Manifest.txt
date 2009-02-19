@@ -1,5 +1,4 @@
 bin/rhogen
-generators/.rhogen.rb.swp
 generators/rhogen.rb
 generators/templates/application/application.rb
 generators/templates/application/config.rb
