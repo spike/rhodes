@@ -52,6 +52,11 @@ module Rhogen
       template.destination = "#{name.camel_case}/config.rb"
     end
 
+    template :buildyml do |template|
+      template.source = 'build.yml'
+      template.destination = "#{name.camel_case}/build.yml"
+    end
+
     directory :public do |directory|
       directory.source = 'public'
       directory.destination = "#{name.camel_case}/public/"
