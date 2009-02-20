@@ -1,32 +1,33 @@
 require File.join(File.dirname(__FILE__),'..','jake.rb')
 
+namespace "config" do
+  task :bb do
+    $config = Jake.config(File.open('build.yml'))  
+    $basedir = pwd
 
-task :config do
-  $config = Jake.config(File.open('build.yml'))
+    $deploydir = File.join($basedir,'deploy','bb')
 
-  $basedir = pwd
-  $bindir = File.join($basedir,'bin')
-  $tmpdir = File.join($bindir,'tmp')
-  $targetdir =  File.join($basedir,'target')
-  $excludelib = ['**/rhom_db_adapter.rb','**/singleton.rb','**/TestServe.rb','**/rhoframework.rb','**/date.rb']
-  $srcdir = File.join($bindir, '/RhoBundle')
-  $compileERBbase = File.join(File.dirname(__FILE__),'..','compileERB')
-  $appmanifest = File.join(File.dirname(__FILE__),'..','manifest','createAppManifest.rb')
-  $res = File.join(File.dirname(__FILE__),'..','..','res')
+    $bindir = File.join($basedir,'bin')
+    $tmpdir = File.join($bindir,'tmp')
+    $targetdir =  File.join($bindir,'target')
+    $excludelib = ['**/rhom_db_adapter.rb','**/singleton.rb','**/TestServe.rb','**/rhoframework.rb','**/date.rb']
+    $srcdir = File.join($bindir, '/RhoBundle')
+    $compileERBbase = File.join(File.dirname(__FILE__),'..','compileERB')
+    $appmanifest = File.join(File.dirname(__FILE__),'..','manifest','createAppManifest.rb')
+    $res = File.join(File.dirname(__FILE__),'..','..','res')
 
-  $prebuilt = File.join($res,'prebuilt')
-  mkdir_p $bindir if not File.exists? $bindir
+    $prebuilt = File.join($res,'prebuilt')
+    mkdir_p $bindir if not File.exists? $bindir
+  end
 end
 
-
-task :loadframework => :config do
+task :loadframework do
   require 'rhodes-framework'
   puts $rhodeslib
 end
 
 namespace "bundle" do
-  desc "create BB bundle"
-  task :bb => :loadframework do
+  task :bb =>  ["config:bb", "loadframework"] do
     jdehome = $config["env"]["paths"][$config["env"]["bbver"]]["jde"]
 
     rm_rf $srcdir
@@ -107,126 +108,110 @@ namespace "bundle" do
       $stdout.flush
 
     cp  File.join($prebuilt, "bb","rhodesApp.alx"), $targetdir
+  end
+end
+
+namespace "device" do
+  desc "Create downloadable app for BlackBerry"
+  task :bb => "bundle:bb" do
     if $config["env"]["bbsignpwd"] and $config["env"]["bbsignpwd"] != ""
-      Rake::Task["run:autosign"].execute
+      Rake::Task["run:bb:autosign"].execute
     else
-      Rake::Task["run:manualsign"].execute
+      Rake::Task["run:bb:manualsign"].execute
     end
 
-    rm_rf $targetdir + "/web"
-    mkdir_p $targetdir + "/web" 
+    rm_rf $deploydir
+    mkdir_p $deploydir 
 
-    #cp $targetdir + "/rhodesApp.jad", $targetdir + "/web"
+    cp File.join($targetdir, "rhodesApp.jad"), $deploydir
 
-    #Jake.unjar($targetdir + "/rhodesApp.cod", $targetdir + "/web")
-
-
-
-      #cp "./rhodesApp.alx", config["build"]["targetdir"] if not FileUtils.uptodate?( config["build"]["targetdir"]+"/rhodesApp.alx", "./rhodesApp.alx")
+    Jake.unjar(File.join($targetdir, "rhodesApp.cod"), $deploydir)
 
 
-    #cp $config["build"]["bindir"] + "/RhoBundle.jar", $config["build"]["rhobundledir"] + "/RhoBundle.jar"
-
-  #  cp_r Dir.glob("**/*.rb"), dest
   end
 end
 
 namespace "run" do
-
-  desc "Run Sim"
-  task :sim do
-    sim = $config["env"]["paths"][$config["env"]["bbver"]]["sim"].to_s
-    jde = $config["env"]["paths"][$config["env"]["bbver"]]["jde"]
+  namespace "bb" do
+    task :sim do
+      sim = $config["env"]["paths"][$config["env"]["bbver"]]["sim"].to_s
+      jde = $config["env"]["paths"][$config["env"]["bbver"]]["jde"]
   
-    command =  '"' + jde + "/simulator/fledge.exe\""
-    args = [] 
-    args << "/app=Jvm.dll"
-    args << "/handheld=" + sim
-    args << "/session=" + sim
-    args << "/app-param=DisableRegistration"
-    args << "/app-param=JvmAlxConfigFile:"+sim+".xml"
-    args << "/data-port=0x4d44"
-    args << "/data-port=0x4d4e"
-    args << "/pin=0x2100000A"
-    args << "\"/app-param=JvmDebugFile:"+ File.join($basedir,'applog.txt') +'"'
-
-    Thread.new { Jake.run(command,args,jde + "/simulator",true) }
-    $stdout.flush
-  end
-
-  desc "Run MDS"
-  task :mds do
-    mdshome =  $config["env"]["paths"][$config["env"]["bbver"]]["mds"]
-    args = []
-    args << "/c"
-    args << "run.bat"
-
-    Thread.new { Jake.run("cmd.exe",args, mdshome,true) }
-
-  end
-
-  desc "Builds everything, loads and starts sim"
-  task :app  => ["bundle:bb", "run:mds", "run:sim"] do
-    sim = $config["env"]["paths"][$config["env"]["bbver"]]["sim"].to_s
-    jde = $config["env"]["paths"][$config["env"]["bbver"]]["jde"]
+      command =  '"' + jde + "/simulator/fledge.exe\""
+      args = [] 
+      args << "/app=Jvm.dll"
+      args << "/handheld=" + sim
+      args << "/session=" + sim
+      args << "/app-param=DisableRegistration"
+      args << "/app-param=JvmAlxConfigFile:"+sim+".xml"
+      args << "/data-port=0x4d44"
+      args << "/data-port=0x4d4e"
+      args << "/pin=0x2100000A"
+      args << "\"/app-param=JvmDebugFile:"+ File.join($basedir,'applog.txt') +'"'
   
-    puts "sleeping to allow simulator to get started"
-    sleep 25
-
-    command = '"' + jde + "/simulator/fledgecontroller.exe\""
-    args = []
-    args << "/session="+sim
-    args << "\"/execute=LoadCod(" + File.join($targetdir,"rhodesApp.cod") + ")\""
-
-    Jake.run(command,args, jde + "/simulator")
- #   $stdout.flush
- #   sleep 15
-
- #   args = []
- #   args << "/session="+sim
- #   args << "/execute=Exit(true)"
- #   Jake.run(command,args, jde + "/simulator")
- #   $stdout.flush
- #   sleep 5
-
- #   Rake::Task["run:sim"].execute
-    $stdout.flush
-  end
-
-  desc "Sign cod files automatically"
-  task :autosign do
-    java = $config["env"]["paths"][$config["env"]["bbver"]]["java"] + "/java.exe"
-    jde = $config["env"]["paths"][$config["env"]["bbver"]]["jde"] 
+      Thread.new { Jake.run(command,args,jde + "/simulator",true) }
+      $stdout.flush
+    end
   
-    args = []
-    args << "-jar"
-    args << '"' + jde + "/bin/SignatureTool.jar\""
-    args << "-c"
-    args << "-a"
-    args << "-p"
-    args << '"' + config["build"]["bbsignpwd"] +'"'
-    args << "-r"
-    args << $targetdir
-
-    puts Jake.run(java,args)
-    $stdout.flush
-
-  end
-
-  desc "Sign cod files manually"
-  task :manualsign do
-    java = $config["env"]["paths"][$config["env"]["bbver"]]["java"] + "/java.exe"
-    jde = $config["env"]["paths"][$config["env"]["bbver"]]["jde"] 
+    task :mds do
+      mdshome =  $config["env"]["paths"][$config["env"]["bbver"]]["mds"]
+      args = []
+      args << "/c"
+      args << "run.bat"
+  
+      Thread.new { Jake.run("cmd.exe",args, mdshome,true) }
+  
+    end
+  
+    desc "Run app in BlackBerry Sim"
+    task :app  => ["bundle:bb", "run:bb:mds", "run:bb:sim"] do
+      sim = $config["env"]["paths"][$config["env"]["bbver"]]["sim"].to_s
+      jde = $config["env"]["paths"][$config["env"]["bbver"]]["jde"]
     
-    args = []
-    args << "-jar"
-    args << '"' + jde + "/bin/SignatureTool.jar\""
-    args << "-r"
-    args << $targetdir
+      puts "sleeping to allow simulator to get started"
+      sleep 25
   
-    puts Jake.run(java,args)
-    $stdout.flush
+      command = '"' + jde + "/simulator/fledgecontroller.exe\""
+      args = []
+      args << "/session="+sim
+      args << "\"/execute=LoadCod(" + File.join($targetdir,"rhodesApp.cod") + ")\""
   
+      Jake.run(command,args, jde + "/simulator")
+      $stdout.flush
+    end
+  
+    task :autosign do
+      java = $config["env"]["paths"][$config["env"]["bbver"]]["java"] + "/java.exe"
+      jde = $config["env"]["paths"][$config["env"]["bbver"]]["jde"] 
+    
+      args = []
+      args << "-jar"
+      args << '"' + jde + "/bin/SignatureTool.jar\""
+      args << "-c"
+      args << "-a"
+      args << "-p"
+      args << '"' + config["build"]["bbsignpwd"] +'"'
+      args << "-r"
+      args << $targetdir
+  
+      puts Jake.run(java,args)
+      $stdout.flush
+  
+    end
+  
+    task :manualsign do
+      java = $config["env"]["paths"][$config["env"]["bbver"]]["java"] + "/java.exe"
+      jde = $config["env"]["paths"][$config["env"]["bbver"]]["jde"] 
+      
+      args = []
+      args << "-jar"
+      args << '"' + jde + "/bin/SignatureTool.jar\""
+      args << "-r"
+      args << $targetdir
+    
+      puts Jake.run(java,args)
+      $stdout.flush
+    
+    end
   end
-
 end
