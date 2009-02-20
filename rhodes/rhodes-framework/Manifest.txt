@@ -1,8 +1,4 @@
 build/syncdbtest.sqlite
-coverage/index.html
-coverage/lib-rho-rhocontroller_rb.html
-coverage/lib-rho-rhosupport_rb.html
-coverage/lib-rho-rhoviewhelpers_rb.html
 lib/bsearch.rb
 lib/builtinME.rb
 lib/date/format.rb
@@ -21,6 +17,7 @@ lib/rho/rhofsconnector.rb
 lib/rho/rhosupport.rb
 lib/rho/rhoviewhelpers.rb
 lib/rho.rb
+lib/rhodes.rb
 lib/rhodes-framework.rb
 lib/rhoframework.rb
 lib/rhofsconnector.rb

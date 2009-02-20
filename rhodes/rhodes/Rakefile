@@ -1,6 +1,6 @@
 %w[rubygems rake rake/clean fileutils newgem].each { |f| require f }
 $:.unshift(File.join(File.dirname(__FILE__), 'lib'))
-require 'lib/version.rb'
+require 'lib/rhodes.rb'
 require '../deps.rb'
 
 task :default => [:spec, :features]

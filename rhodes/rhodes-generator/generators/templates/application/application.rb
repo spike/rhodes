@@ -1,4 +1,4 @@
 require 'rho/rhoapplication'
 
-class <%= class_name %>Application < Rho::RhoApplication
+class AppApplication < Rho::RhoApplication
 end

@@ -37,16 +37,20 @@ namespace "bundle" do
     rubypath =  File.join($res,'RhoRuby.exe')
     xruby =  File.join($res,'xruby-0.3.3.jar')
 
-    src = $rhodeslib
     dest = $srcdir 
-    cp_r src,dest
+    chdir $rhodeslib
+    Dir.glob("*").each { |f| 
+      src = f
+      cp_r src,dest
+    }
     chdir dest
+    Dir.glob("**/rhodes-framework.rb").each {|f| rm f}
     Dir.glob("**/erb.rb").each {|f| rm f}
     Dir.glob("**/find.rb").each {|f| rm f}
     $excludelib.each {|e| Dir.glob(e).each {|f| rm f}}
 
     chdir $basedir
-
+#throw "ME"
     cp_r 'app',File.join($srcdir,'apps')
     cp_r 'public', File.join($srcdir,'apps')
     cp   'config.rb', File.join($srcdir,'apps')
@@ -144,7 +148,7 @@ namespace "run" do
     args << "/data-port=0x4d44"
     args << "/data-port=0x4d4e"
     args << "/pin=0x2100000A"
-    args << "\"/app-param=JvmDebugFile:"+Jake.get_absolute($config["env"]["applog"]) +'"'
+    args << "\"/app-param=JvmDebugFile:"+ File.join($basedir,'applog.txt') +'"'
 
     Thread.new { Jake.run(command,args,jde + "/simulator",true) }
     $stdout.flush
@@ -175,17 +179,17 @@ namespace "run" do
     args << "\"/execute=LoadCod(" + File.join($targetdir,"rhodesApp.cod") + ")\""
 
     Jake.run(command,args, jde + "/simulator")
-    $stdout.flush
-    sleep 15
+ #   $stdout.flush
+ #   sleep 15
 
-    args = []
-    args << "/session="+sim
-    args << "/execute=Exit(true)"
-    Jake.run(command,args, jde + "/simulator")
-    $stdout.flush
-    sleep 5
+ #   args = []
+ #   args << "/session="+sim
+ #   args << "/execute=Exit(true)"
+ #   Jake.run(command,args, jde + "/simulator")
+ #   $stdout.flush
+ #   sleep 5
 
-    Rake::Task["run:sim"].execute
+ #   Rake::Task["run:sim"].execute
     $stdout.flush
   end
 

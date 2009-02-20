@@ -1,5 +1,4 @@
 Rakefile
 lib/rhodes.rb
-lib/version.rb
 rhodes.gemspec
 spec/spec.opts
