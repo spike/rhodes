@@ -93,32 +93,32 @@ module Rhogen
 
     template :config do |template|
       template.source = 'config.rb'
-      template.destination = "#{name.camel_case}/config.rb"
+      template.destination = "app/#{name.camel_case}/config.rb"
     end
 
     template :index do |template|
       template.source = 'index.erb'
-      template.destination = "#{name.camel_case}/index.erb"
+      template.destination = "app/#{name.camel_case}/index.erb"
     end
 
     template :edit do |template|
       template.source = 'edit.erb'
-      template.destination = "#{name.camel_case}/edit.erb"
+      template.destination = "app/#{name.camel_case}/edit.erb"
     end
 
     template :new do |template|
       template.source = 'new.erb'
-      template.destination = "#{name.camel_case}/new.erb"
+      template.destination = "app/#{name.camel_case}/new.erb"
     end
     
     template :new do |template|
       template.source = 'show.erb'
-      template.destination = "#{name.camel_case}/show.erb"
+      template.destination = "app/#{name.camel_case}/show.erb"
     end
 
     template :controller do |template|
       template.source = 'controller.rb'
-      template.destination = "#{name.camel_case}/controller.rb"
+      template.destination = "app/#{name.camel_case}/controller.rb"
     end
 
 
