@@ -14,7 +14,8 @@ env:
       java: C:/Install/Java/jdk1.6.0_11/bin
       mds: C:/Program Files/Research In Motion/BlackBerry Email and MDS Services Simulators 4.1.2/MDS
       sim: 8100
-
+    cabwiz: C:/Program Files/Windows Mobile 6 SDK/Tools/CabWiz/cabwiz.exe
+    wmemu: C:/Program Files/Microsoft Device Emulator/1.0/dvcemumanager.exe
  
 
 

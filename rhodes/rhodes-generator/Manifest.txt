@@ -1,6 +1,7 @@
 bin/rhogen
 generators/rhogen.rb
 generators/templates/application/application.rb
+generators/templates/application/build.yml
 generators/templates/application/config.rb
 generators/templates/application/index.erb
 generators/templates/application/layout.erb
@@ -131,7 +132,6 @@ generators/templates/application/public/js/prototype-1.6.0.2.js
 generators/templates/application/public/js/rho.js
 generators/templates/application/public/js/rhogeolocation-wm.js
 generators/templates/application/public/js/rhogeolocation.js
-generators/templates/application/build.yml
 generators/templates/application/Rakefile
 generators/templates/bundle/db/syncdb.sqlite
 generators/templates/model/config.rb
