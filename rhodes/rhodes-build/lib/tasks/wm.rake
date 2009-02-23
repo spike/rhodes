@@ -95,10 +95,14 @@ namespace "run" do
     desc "Run app in iphone Sim"
     task :app  => ["bundle:wm"] do
  
-      src = File.join($prebuilt,"wm","Windows Mobile 6 Professional SDK (ARMV4I)")
-      dest = $bindir
+      src = File.join($prebuilt,"wm","wm6.7z")
 
-      cp_r src,dest
+      seven = File.join($res,"7z.exe")
+      chdir $bindir
+
+      puts `#{seven} x #{src}`
+
+      chdir $basedir
 
       src = File.join($prebuilt,"wm","db")
       dest = $srcdir
@@ -121,7 +125,7 @@ namespace "run" do
       mv "rhodes.inf", $bindir
       mv "rhodes.cab", $targetdir
 
-      system($config["env"]["paths"]["wmemu"])
+      Thread.new { system($config["env"]["paths"]["wmemu"]) }
 
       puts "BUILD COMPLETE"
       puts "*** Your .cab file is located in #{$targetdir}\\rhodes.cab"
