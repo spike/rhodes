@@ -1,0 +1,8 @@
+rhodes-framework:
+   lib/rho/rho.rb
+	change app name to always be AppApplication
+
+rhodes-generator:
+   generators/rhogen.rb
+	changes to generator
+
